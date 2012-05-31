@@ -2,6 +2,6 @@ To load:
 
 > (load "tag-defs.scm")
 
-To run example:
+To run example, load tag-defs.scm, then:
 
 > (load "test.scm")
