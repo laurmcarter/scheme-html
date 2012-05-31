@@ -15,13 +15,11 @@
 (define-syntax doc
   (syntax-rules ()
     ((_ b b* ...)
-     (let ((php-out (open-output-file (php-out-file)))
-           (css-out (open-output-file (css-out-file))))
+     (let ((php-out (php-out-file))
+           (css-out (css-out-file)))
        (eval-branch 'b css-out php-out)
        (eval-branch 'b* css-out php-out)
-       ...
-       (close-output-port php-out)
-       (close-output-port css-out)))))
+       ...))))
 
 (define string-join
   (lambda (sep)
@@ -160,8 +158,16 @@
 (define eval-branch
   (lambda (e css php)
     (pmatch e
-      [(css . ,e*) (display (eval-css e) css)]
-      [,else (display (eval-html e) php)])))
+      [(css . ,e*)
+       (with-output-to-file css
+         (lambda ()
+           (display (eval-css e)))
+         'replace)]
+      [,else
+       (with-output-to-file php
+         (lambda ()
+           (display (eval-html e)))
+         'replace)])))
 
 (define eval-html
   (lambda (e)
